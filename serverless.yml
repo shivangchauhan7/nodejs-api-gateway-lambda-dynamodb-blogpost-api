@@ -1,0 +1,113 @@
+service: blog-application-nodejs-serverless
+
+frameworkVersion: ">=1.1.0 <2.0.0"
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+
+custom:
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  environment:
+    DYNAMO_TABLE_NAME: users_blogpost
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMO_TABLE_NAME}"
+
+functions:
+  signup:
+    handler: user/signup.signup
+    events:
+      - http:
+          path: user/signup
+          method: post
+          cors: true
+
+  listposts:
+    handler: post/listall.listall
+    events:
+      - http:
+          path: posts/list
+          method: get
+          cors: true
+  login:
+    handler: user/login.login
+    events:
+      - http:
+          path: user/login
+          method: post
+          cors: true
+
+  createpost:
+    handler: post/create.create
+    events:
+      - http:
+          path: post/create
+          method: post
+          cors: true
+          authorizer: authCheck
+
+    getpost:
+      handler: post/getpost.getpost
+      events:
+        - http:
+            path: post/post/{id}
+            method: get
+            cors: true
+            authorizer: authCheck
+
+  updatepost:
+    handler: post/updatepost.updatepost
+    events:
+      - http:
+          path: post/updatepost
+          method: post
+          cors: true
+          authorizer: authCheck
+
+  deletepost:
+    handler: post/deletepost.deletepost
+    events:
+      - http:
+          path: post/deletepost
+          method: post
+          cors: true
+          authorizer: authCheck
+  authCheck:
+    handler: middlewares/auth.authCheck
+
+resources:
+  Resources:
+    UsersDynamoDbTable:
+      Type: AWS::DynamoDb::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinations:
+          - AttributeName: userid
+            AttributeType: N
+          - AttributeName: postid
+            AttributeType: N
+        KeySchema:
+          - AttributeName: userid
+            KeyType: HASH
+          - AttributeName: postid
+            KeyType: RANGE
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.DYNAMO_TABLE_NAME}

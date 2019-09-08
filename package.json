@@ -1,0 +1,16 @@
+{
+  "name": "blognode",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.524.0",
+    "serverless-dynamodb-local": "^0.2.38",
+    "serverless-offline": "^5.10.1"
+  }
+}
