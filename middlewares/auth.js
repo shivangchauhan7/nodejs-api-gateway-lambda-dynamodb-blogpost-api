@@ -1,3 +1,5 @@
+"use strict";
+
 module.exports.authCheck = (event, context, callback) => {
   if (!event.authorizationToken) {
     return callback("Not allowed!");

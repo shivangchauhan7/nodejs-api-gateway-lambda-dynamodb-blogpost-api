@@ -18,6 +18,7 @@ provider:
   runtime: nodejs8.10
   environment:
     DYNAMO_TABLE_NAME: users_blogpost
+    ENVIRONMENT: LOCAL
   iamRoleStatements:
     - Effect: Allow
       Action:
