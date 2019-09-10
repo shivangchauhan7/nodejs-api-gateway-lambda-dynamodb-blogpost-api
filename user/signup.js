@@ -1,44 +1,54 @@
-const dynamoDb = require("../config/dynamoDb");
+"use strict";
+
 const uuidv1 = require("uuid/v1");
+const dynamoDb = require("../config/dynamoDb");
+const { validateBody, sendResponse } = require("../functions/index");
 
 module.exports.signup = async event => {
   const body = JSON.parse(event.body);
   const userid = uuidv1();
-  let isValid = true;
-  Object.values(body).forEach(el => {
-    if (!el) isValid = false;
-  });
+  let isValid = validateBody(body);
+
   if (isValid) {
     const { name, email, password } = body;
-    const sortKey = "user";
-    const params = {
-      TableName: process.env.DYNAMO_TABLE_NAME,
-      Item: {
-        userid,
-        postid: sortKey,
-        name,
-        email,
-        password
-      },
-      ConditionExpression: "attribute_not_exists(email)"
+    const tableName = process.env.DYNAMO_TABLE_NAME;
+
+    const emailCheckParams = {
+      TableName: tableName,
+      IndexName: "index",
+      KeyConditionExpression: "email = :emailId",
+      ExpressionAttributeValues: { ":emailId": email },
+      ScanIndexForward: true,
+      Limit: 1,
+      Select: "ALL_ATTRIBUTES"
     };
 
     try {
-      await dynamoDb.put(params).promise();
-      return sendResponse(200, "User registered successfully.");
+      const data = await dynamoDb.query(emailCheckParams).promise();
+      console.log("data", data);
+      if (data.Count > 0) {
+        return sendResponse(400, "Email already exists!");
+      } else {
+        const sortKey = "user";
+        const params = {
+          TableName: tableName,
+          Item: {
+            userid,
+            postid: sortKey,
+            name,
+            email,
+            password
+          },
+          ConditionExpression: "attribute_not_exists(userid)"
+        };
+        await dynamoDb.put(params).promise();
+        return sendResponse(200, "User registered successfully.");
+      }
     } catch (e) {
-      return sendResponse(501, "Cannot create a user.");
+      console.log(e);
+      return sendResponse(501, "Cannot register user");
     }
   } else {
     return sendResponse(400, "Invalid input data.");
   }
-};
-
-const sendResponse = (statusCode, message) => {
-  const response = {
-    statusCode: statusCode,
-    body: message,
-    headers: { "Content-Type": "text/plain" }
-  };
-  return response;
 };

@@ -95,14 +95,14 @@ functions:
 resources:
   Resources:
     UsersDynamoDbTable:
-      Type: AWS::DynamoDb::Table
+      Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
       Properties:
-        AttributeDefinations:
+        AttributeDefinitions:
           - AttributeName: userid
-            AttributeType: N
+            AttributeType: S
           - AttributeName: postid
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           - AttributeName: userid
             KeyType: HASH
