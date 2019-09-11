@@ -2,7 +2,11 @@
 
 const uuidv1 = require("uuid/v1");
 const dynamoDb = require("../config/dynamoDb");
-const { validateBody, sendResponse } = require("../functions/index");
+const {
+  validateBody,
+  sendResponse,
+  createHash
+} = require("../functions/index");
 
 module.exports.signup = async event => {
   const body = JSON.parse(event.body);
@@ -29,6 +33,8 @@ module.exports.signup = async event => {
       if (data.Count > 0) {
         return sendResponse(400, "Email already exists!");
       } else {
+        const passwordHash = await createHash(password);
+        console.log("hash", passwordHash);
         const sortKey = "user";
         const params = {
           TableName: tableName,
@@ -37,7 +43,7 @@ module.exports.signup = async event => {
             postid: sortKey,
             name,
             email,
-            password
+            password: passwordHash
           },
           ConditionExpression: "attribute_not_exists(userid)"
         };

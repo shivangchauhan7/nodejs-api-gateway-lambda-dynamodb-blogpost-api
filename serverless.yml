@@ -17,7 +17,7 @@ provider:
   name: aws
   runtime: nodejs8.10
   environment:
-    DYNAMO_TABLE_NAME: users_blogpost
+    DYNAMO_TABLE_NAME: users_blogspot
     ENVIRONMENT: LOCAL
   iamRoleStatements:
     - Effect: Allow
