@@ -63,14 +63,14 @@ functions:
           cors: true
           authorizer: authCheck
 
-    getpost:
-      handler: post/getpost.getpost
-      events:
-        - http:
-            path: post/post/{id}
-            method: get
-            cors: true
-            authorizer: authCheck
+  getpost:
+    handler: post/getpost.getpost
+    events:
+      - http:
+          path: post/{id}
+          method: get
+          cors: true
+          authorizer: authCheck
 
   updatepost:
     handler: post/updatepost.updatepost

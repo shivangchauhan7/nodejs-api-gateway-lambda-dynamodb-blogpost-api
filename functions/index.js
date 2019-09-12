@@ -62,10 +62,40 @@ const checkHash = (password, hash) => {
   });
 };
 
+const verifyJwt = async token => {
+  return new Promise((resolve, reject) => {
+    try {
+      const tokenData = jwt.verify(token, "secret");
+      resolve(tokenData);
+    } catch (e) {
+      reject(false);
+    }
+  });
+};
+
+const generatePolicy = (tokenData, effect, resource) => {
+  const authResponse = {};
+  authResponse.principalId = tokenData;
+  if (effect && resource) {
+    const policyDocument = {};
+    policyDocument.Version = "2012-10-17";
+    policyDocument.Statement = [];
+    const statementOne = {};
+    statementOne.Action = "execute-api:Invoke";
+    statementOne.Effect = effect;
+    statementOne.Resource = resource;
+    policyDocument.Statement[0] = statementOne;
+    authResponse.policyDocument = policyDocument;
+  }
+  return authResponse;
+};
+
 module.exports = {
   validateBody,
   sendResponse,
   signJwt,
   createHash,
-  checkHash
+  checkHash,
+  verifyJwt,
+  generatePolicy
 };
