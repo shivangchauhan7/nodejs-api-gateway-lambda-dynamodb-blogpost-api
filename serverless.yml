@@ -46,6 +46,7 @@ functions:
           path: posts/list
           method: get
           cors: true
+          authorizer: authCheck
   login:
     handler: user/login.login
     events:

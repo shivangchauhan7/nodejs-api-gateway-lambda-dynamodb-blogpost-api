@@ -9,7 +9,7 @@ module.exports.getpost = async event => {
     if (id) {
       const params = {
         TableName: process.env.DYNAMO_TABLE_NAME,
-        Index: "index",
+        IndexName: "index2",
         KeyConditionExpression: "postid = :postId",
         ExpressionAttributeValues: {
           ":postId": id
@@ -19,7 +19,11 @@ module.exports.getpost = async event => {
       };
 
       const data = await dynamoDb.query(params).promise();
-      return sendResponse(200, JSON.stringify(data.Items));
+      if (data.Count > 0) {
+        return sendResponse(200, JSON.stringify(data.Items));
+      } else {
+        return sendResponse(404, "Post not found.");
+      }
     } else {
       return sendResponse(400, "Invalid post id.");
     }
