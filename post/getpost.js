@@ -28,7 +28,6 @@ module.exports.getpost = async event => {
       return sendResponse(400, "Invalid post id.");
     }
   } catch (e) {
-    console.log(e);
     return sendResponse(444, "Cannot fetch this blog post.");
   }
 };

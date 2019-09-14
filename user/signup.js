@@ -29,12 +29,10 @@ module.exports.signup = async event => {
 
     try {
       const data = await dynamoDb.query(emailCheckParams).promise();
-      console.log("data", data);
       if (data.Count > 0) {
         return sendResponse(400, "Email already exists!");
       } else {
         const passwordHash = await createHash(password);
-        console.log("hash", passwordHash);
         const sortKey = "user";
         const params = {
           TableName: tableName,
@@ -51,7 +49,6 @@ module.exports.signup = async event => {
         return sendResponse(200, "User registered successfully.");
       }
     } catch (e) {
-      console.log(e);
       return sendResponse(501, "Cannot register user");
     }
   } else {

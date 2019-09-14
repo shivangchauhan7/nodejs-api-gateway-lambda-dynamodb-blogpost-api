@@ -1,7 +1,6 @@
 const AWS = require("aws-sdk");
 
 let options = {};
-console.log("sdsdsd", process.env.ENVIRONMENT);
 if (process.env.ENVIRONMENT === "LOCAL") {
   options = {
     region: "localhost",

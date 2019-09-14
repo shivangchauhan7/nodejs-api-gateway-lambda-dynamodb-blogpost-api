@@ -38,7 +38,6 @@ module.exports.login = async event => {
         return sendResponse(404, "User not found!");
       }
     } catch (e) {
-      console.log(e);
       return sendResponse(401, "Cannot authenticate");
     }
   } else {

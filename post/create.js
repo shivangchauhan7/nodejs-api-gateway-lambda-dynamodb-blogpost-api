@@ -29,12 +29,11 @@ module.exports.create = async event => {
           .query(isUserExistsParams)
           .promise();
         if (isUserIdExists.Count > 0) {
-          console.log("post", postid);
           const params = {
             TableName,
             Item: {
               userid,
-              postid,
+              postid: `post-${postid}`,
               postTitle,
               postBody,
               imgUrl,

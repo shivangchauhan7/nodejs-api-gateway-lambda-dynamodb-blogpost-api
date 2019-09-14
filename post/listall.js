@@ -14,7 +14,7 @@ module.exports.listall = async event => {
         "userid = :userId AND begins_with(postid,:postId)",
       ExpressionAttributeValues: {
         ":userId": userid,
-        ":postId": "user"
+        ":postId": "post"
       },
       ScanIndexForward: true,
       Select: "ALL_ATTRIBUTES"
@@ -23,7 +23,6 @@ module.exports.listall = async event => {
     const posts = await dynamoDb.query(params).promise();
     return sendResponse(200, JSON.stringify(posts.Items));
   } catch (e) {
-    console.log(e);
     return sendResponse(444, "Cannot get user posts.");
   }
 };

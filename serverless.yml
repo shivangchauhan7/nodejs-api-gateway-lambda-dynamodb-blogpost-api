@@ -83,11 +83,11 @@ functions:
           authorizer: authCheck
 
   deletepost:
-    handler: post/deletepost.deletepost
+    handler: post/delete.delete
     events:
       - http:
           path: post/deletepost
-          method: post
+          method: delete
           cors: true
           authorizer: authCheck
   authCheck:
