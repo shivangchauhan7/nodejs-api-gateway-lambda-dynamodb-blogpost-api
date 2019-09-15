@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 
 const validateBody = body => {
   let isValid = true;
@@ -68,6 +68,7 @@ const verifyJwt = async token => {
       const tokenData = jwt.verify(token, "secret");
       resolve(tokenData);
     } catch (e) {
+      console.log("error from token", e);
       reject(false);
     }
   });
@@ -75,7 +76,7 @@ const verifyJwt = async token => {
 
 const generatePolicy = (tokenData, effect, resource) => {
   const authResponse = {};
-  authResponse.principalId = tokenData;
+  authResponse.principalId = JSON.stringify(tokenData);
   if (effect && resource) {
     const policyDocument = {};
     policyDocument.Version = "2012-10-17";
@@ -83,10 +84,11 @@ const generatePolicy = (tokenData, effect, resource) => {
     const statementOne = {};
     statementOne.Action = "execute-api:Invoke";
     statementOne.Effect = effect;
-    statementOne.Resource = resource;
+    statementOne.Resource = "*";
     policyDocument.Statement[0] = statementOne;
     authResponse.policyDocument = policyDocument;
   }
+  console.log("auth response", authResponse);
   return authResponse;
 };
 

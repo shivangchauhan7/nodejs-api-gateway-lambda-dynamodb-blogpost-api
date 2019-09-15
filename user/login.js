@@ -14,7 +14,7 @@ module.exports.login = async event => {
   if (isValid) {
     const checkEmailParams = {
       TableName: process.env.DYNAMO_TABLE_NAME,
-      IndexName: "index",
+      IndexName: process.env.INDEX1,
       KeyConditionExpression: "email = :emailId AND postid = :postId",
       ExpressionAttributeValues: { ":emailId": body.email, ":postId": "user" },
       ScanIndexForward: true,

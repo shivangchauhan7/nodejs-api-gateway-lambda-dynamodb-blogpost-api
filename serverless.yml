@@ -2,23 +2,12 @@ service: blog-application-nodejs-serverless
 
 frameworkVersion: ">=1.1.0 <2.0.0"
 
-plugins:
-  - serverless-dynamodb-local
-  - serverless-offline
-
-custom:
-  dynamodb:
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-
 provider:
   name: aws
   runtime: nodejs8.10
   environment:
     DYNAMO_TABLE_NAME: users_blogspot
-    ENVIRONMENT: LOCAL
+    ENVIRONMENT: LIVE
     INDEX1: email_partition_index
     INDEX2: other_index
   iamRoleStatements:
@@ -30,14 +19,20 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - lambda:InvokeFunction
       Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMO_TABLE_NAME}"
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMO_TABLE_NAME}/index/*"
 
 functions:
   signup:
     handler: user/signup.signup
     events:
       - http:
-          path: user/signup
+          path: signup
           method: post
           cors: true
 
@@ -94,6 +89,8 @@ functions:
           authorizer: authCheck
   authCheck:
     handler: middlewares/auth.authCheck
+    Properties:
+      AuthorizerResultTtlInSeconds: 0
 
 resources:
   Resources:
@@ -106,6 +103,8 @@ resources:
             AttributeType: S
           - AttributeName: postid
             AttributeType: S
+          - AttributeName: email
+            AttributeType: S
         KeySchema:
           - AttributeName: userid
             KeyType: HASH
@@ -117,17 +116,19 @@ resources:
         TableName: ${self:provider.environment.DYNAMO_TABLE_NAME}
 
         GlobalSecondaryIndexes:
-          - IndexName: self:provider.environment.INDEX1
+          - IndexName: ${self:provider.environment.INDEX1}
             KeySchema:
               - AttributeName: email
                 KeyType: HASH
+              - AttributeName: postid
+                KeyType: RANGE
             Projection:
               ProjectionType: ALL
             ProvisionedThroughput:
               ReadCapacityUnits: "1"
               WriteCapacityUnits: "1"
 
-          - IndexName: self:provider.environment.INDEX2
+          - IndexName: ${self:provider.environment.INDEX2}
             KeySchema:
               - AttributeName: postid
                 KeyType: HASH

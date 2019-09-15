@@ -6,7 +6,8 @@ const { sendResponse } = require("../functions/index");
 module.exports.listall = async event => {
   try {
     const userData = event.requestContext.authorizer.principalId;
-    const { userid } = userData;
+    const parsedData = JSON.parse(userData);
+    const { userid } = parsedData;
     if (!userid) return sendResponse(400, "Invalid user id.");
     const params = {
       TableName: process.env.DYNAMO_TABLE_NAME,

@@ -9,6 +9,7 @@ const {
 } = require("../functions/index");
 
 module.exports.signup = async event => {
+  console.log("event", event);
   const body = JSON.parse(event.body);
   const userid = uuidv1();
   let isValid = validateBody(body);
@@ -19,7 +20,7 @@ module.exports.signup = async event => {
 
     const emailCheckParams = {
       TableName: tableName,
-      IndexName: "index",
+      IndexName: process.env.INDEX1,
       KeyConditionExpression: "email = :emailId",
       ExpressionAttributeValues: { ":emailId": email },
       ScanIndexForward: true,
@@ -49,6 +50,7 @@ module.exports.signup = async event => {
         return sendResponse(200, "User registered successfully.");
       }
     } catch (e) {
+      console.log(e);
       return sendResponse(501, "Cannot register user");
     }
   } else {

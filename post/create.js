@@ -10,7 +10,8 @@ module.exports.create = async event => {
   if (isValid) {
     try {
       const userData = event.requestContext.authorizer.principalId;
-      const { userid } = userData;
+      const parsedData = JSON.parse(userData);
+      const { userid } = parsedData;
       const { postTitle, postBody, imgUrl, tags } = body;
       if (userid) {
         const postid = uuidv1();

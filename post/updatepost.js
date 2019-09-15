@@ -11,12 +11,13 @@ module.exports.updatepost = async event => {
 
     const { postTitle, postBody, imgUrl, tags, postid } = body;
     const userData = event.requestContext.authorizer.principalId;
-    const { userid } = userData;
+    const parsedData = JSON.parse(userData);
+    const { userid } = parsedData;
     const params = {
       TableName: process.env.DYNAMO_TABLE_NAME,
       Key: {
         userid,
-        postid
+        postid: `post-${postid}`
       },
       ExpressionAttributeValues: {
         ":postTitle": postTitle,

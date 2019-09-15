@@ -9,10 +9,10 @@ module.exports.getpost = async event => {
     if (id) {
       const params = {
         TableName: process.env.DYNAMO_TABLE_NAME,
-        IndexName: "index2",
+        IndexName: process.env.INDEX2,
         KeyConditionExpression: "postid = :postId",
         ExpressionAttributeValues: {
-          ":postId": id
+          ":postId": `post-${id}`
         },
         ScanIndexForward: true,
         Select: "ALL_ATTRIBUTES"

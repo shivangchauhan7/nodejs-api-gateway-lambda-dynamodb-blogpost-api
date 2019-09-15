@@ -9,7 +9,8 @@ module.exports.delete = async event => {
     const isValid = validateBody(body);
     if (!isValid) return sendResponse(400, "Invalid input details.");
     const userData = event.requestContext.authorizer.principalId;
-    const { userid } = userData;
+    const parsedData = JSON.parse(userData);
+    const { userid } = parsedData;
     const { postid } = body;
     if (postid) {
       const params = {
@@ -20,7 +21,8 @@ module.exports.delete = async event => {
         }
       };
 
-      const data = await dynamoDb.delete(params).promise();
+      await dynamoDb.delete(params).promise();
+      return sendResponse(200, "Success");
     } else {
       return sendResponse(400, "Invalid post id.");
     }
