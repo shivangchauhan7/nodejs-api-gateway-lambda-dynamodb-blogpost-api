@@ -19,6 +19,8 @@ provider:
   environment:
     DYNAMO_TABLE_NAME: users_blogspot
     ENVIRONMENT: LOCAL
+    INDEX1: email_partition_index
+    INDEX2: other_index
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -113,3 +115,24 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMO_TABLE_NAME}
+
+        GlobalSecondaryIndexes:
+          - IndexName: self:provider.environment.INDEX1
+            KeySchema:
+              - AttributeName: email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
+
+          - IndexName: self:provider.environment.INDEX2
+            KeySchema:
+              - AttributeName: postid
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: "1"
+              WriteCapacityUnits: "1"
